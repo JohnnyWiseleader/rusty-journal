@@ -4,7 +4,6 @@ use serde::Serialize;
 use std::fmt;
 use std::fs::{File, OpenOptions};
 use std::io::{Error, ErrorKind, Result, Seek, SeekFrom};
-use std::io::{Result, Seek, SeekFrom};
 use std::path::PathBuf; // Include the `Error` type.
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -31,7 +30,7 @@ impl fmt::Display for Task {
 
 pub fn add_task(journal_path: PathBuf, task: Task) -> Result<()> {
     // Open the file.
-    let mut file = OpenOptions::new()
+    let file = OpenOptions::new()
         .read(true)
         .write(true)
         .create(true)
@@ -49,7 +48,7 @@ pub fn add_task(journal_path: PathBuf, task: Task) -> Result<()> {
 
 pub fn complete_task(journal_path: PathBuf, task_position: usize) -> Result<()> {
     // Open the file.
-    let file = OpenOptions::new()
+    let mut file = OpenOptions::new()
         .read(true)
         .write(true)
         .open(journal_path)?;
