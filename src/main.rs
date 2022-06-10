@@ -3,6 +3,7 @@ mod cli;
 mod tasks;
 
 use cli::{Action::*, CommandLineArgs};
+use std::path::PathBuf;
 use tasks::Task;
 
 fn main() {
@@ -13,7 +14,9 @@ fn main() {
     } = CommandLineArgs::from_args();
 
     // Unpack the journal file.
-    let journal_file = journal_file.expect("Failed to find journal file");
+    let journal_file = journal_file
+        .or_else(find_default_journal_file)
+        .expect("Failed to find journal file.");
 
     // Perform the action.
     match action {
@@ -22,4 +25,11 @@ fn main() {
         Done { position } => tasks::complete_task(journal_file, position),
     }
     .expect("Failed to perform action")
+}
+
+fn find_default_journal_file() -> Option<PathBuf> {
+    home::home_dir().map(|mut path| {
+        path.push(".rusty-journal.json");
+        path
+    })
 }
